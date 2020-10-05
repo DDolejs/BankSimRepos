@@ -12,6 +12,7 @@ namespace BankSim
         {
             Console.WriteLine("Ahoj");
             Console.ReadLine();
+            Console.WriteLine("Bye");
         }
     }
 }
