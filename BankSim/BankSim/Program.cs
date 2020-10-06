@@ -19,7 +19,10 @@ Remove ~ Zrušení účtu
             switch(decision)
             {
                 case "Add":
-                    Account acc = new Account("Sporici", 50000);
+                    Console.Write("Zadej typ (Spořící/Úvěrový): ");
+                    string type = Console.ReadLine();
+                    if(type == "Sporici" || type == "Spořící") { Sporici sp = new Sporici(50000); }
+                    if (type == "Uverovy" || type == "Úvěrový") { Uverovy uv = new Uverovy(50000); }
                     break;
                 case "Manage":
                     break;
@@ -31,13 +34,31 @@ Remove ~ Zrušení účtu
 
     public class Account
     {
-        public Account(string typ, int vklad)
+        public Account(string typ)
         {
             Typ = typ;
-            Vklad = vklad;
         }
 
         public string Typ { get; set; }
+    }
+
+    public class Sporici:Account
+    {
+        public Sporici(int vklad):base("Sporici")
+        {
+            Vklad = vklad;
+        }
+
+        public int Vklad { get; set; }
+    }
+
+    public class Uverovy:Account
+    {
+        public Uverovy(int vklad) : base("Uverovy")
+        {
+            Vklad = vklad;
+        }
+
         public int Vklad { get; set; }
     }
 }
