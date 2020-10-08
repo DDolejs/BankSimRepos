@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
 using System.Security.Policy;
 using System.Text;
@@ -12,17 +13,16 @@ namespace BankSim
 {
     class Program
     {
-        
-        
-
         static void Main(string[] args)
         {
+            Account acc = new Account();
+            Timer ti = new Timer(1000);
+            Time t = new Time(DateTime.Now);
+            t.TimeStart(ti);
+            List<Account> AccountList = new List<Account>();
             do
             {
                 Console.Clear();
-                Timer ti = new Timer(1000);
-                Time t = new Time(DateTime.Now);
-                t.TimeStart(ti);
                 Console.Write(@"Add ~ Vytvoření účtu
 Manage ~ Možnost úpravy účtu
 Remove ~ Zrušení účtu
@@ -33,21 +33,18 @@ Příkaz: ");
                 switch (decision)
                 {
                     case "Add":
-                        Console.Write("Zadej typ (Spořící/Úvěrový/Studentský): ");
-                        string type = Console.ReadLine();
-                        if (type == "Sporici" || type == "Spořící") { Sporici sp = new Sporici(50000); }
-                        if (type == "Studentsky" || type == "Studentský") { Studentsky st = new Studentsky(50000); }
-                        if (type == "Uverovy" || type == "Úvěrový") { Uverovy uv = new Uverovy(50000); }
-                        else { throw new FormatException(); }
+                        acc.AccountAdd(AccountList);
                         break;
                     case "Manage":
                         break;
                     case "Remove":
+                        acc.AccountRemove(AccountList);
                         break;
                     case "Date":
                         Console.WriteLine(t.ToString());
                         break;
                 }
+                Console.ReadLine();
             } while (true);
         }
     }
@@ -81,28 +78,54 @@ Příkaz: ");
         public Account(string typ, int vklad)
         {
             Typ = typ;
-            Vklad = vklad;
+            Zustatek = vklad;
+        }
+
+        public Account()
+        {
+
         }
 
         public string Typ { get; set; }
-        public int Vklad { get; set; }
+        public int Zustatek { get; set; }
+
+        public List<Account> AccountAdd(List<Account> AccountList)
+        {
+            Console.Write("Zadej typ (Spořící/Úvěrový/Studentský): ");
+            string type = Console.ReadLine();
+            if (type == "Sporici" || type == "Spořící") { Sporici sp = new Sporici(50000); AccountList.Add(sp); }
+            if (type == "Studentsky" || type == "Studentský") { Studentsky st = new Studentsky(50000); AccountList.Add(st); }
+            if (type == "Uverovy" || type == "Úvěrový") { Uverovy uv = new Uverovy(50000); AccountList.Add(uv); }
+            else { throw new FormatException(); }
+            return AccountList;
+        }
+
+        public List<Account> AccountRemove(List<Account> AccountList)
+        {
+            Console.Write("Zadej typ (Spořící/Úvěrový/Studentský): ");
+            string whatToRemove = Console.ReadLine();
+            if (whatToRemove == "Sporici" || whatToRemove == "Spořící") { Sporici sp = new Sporici(50000); AccountList.Remove(sp); }
+            if (whatToRemove == "Studentsky" || whatToRemove == "Studentský") { Studentsky st = new Studentsky(50000); AccountList.Remove(st); }
+            if (whatToRemove == "Uverovy" || whatToRemove == "Úvěrový") { Uverovy uv = new Uverovy(50000); AccountList.Remove(uv); }
+            else { throw new FormatException(); }
+            return AccountList;
+
+        }
     }
 
     public class Sporici:Account
     {
         public Sporici(int vklad):base("Sporici", vklad)
         {
-            Vklad = vklad;
+            Zustatek = vklad;
         }
-
-        public bool Student { get; set; }
     }
 
     public class Uverovy:Account
     {
         public Uverovy(int vklad) : base("Uverovy", vklad)
         {
-            Vklad = vklad;
+            Zustatek = vklad;
         }
     }
 
@@ -110,7 +133,7 @@ Příkaz: ");
     {
         public Studentsky(int vklad):base("Studentsky", vklad)
         {
-            Vklad = vklad;
+            Zustatek = vklad;
 
         }
     }
