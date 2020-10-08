@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -15,41 +17,47 @@ namespace BankSim
 
         static void Main(string[] args)
         {
-            Timer ti = new Timer(1000);
-            Time t = new Time(DateTime.Now);
-            t.TimeStart(ti); 
-            Console.Write(@"Add ~ Vytvoření účtu
+            do
+            {
+                Console.Clear();
+                Timer ti = new Timer(1000);
+                Time t = new Time(DateTime.Now);
+                t.TimeStart(ti);
+                Console.Write(@"Add ~ Vytvoření účtu
 Manage ~ Možnost úpravy účtu
 Remove ~ Zrušení účtu
 Date ~ Vypsání dnešního data
-");
-            string decision = Console.ReadLine();
+Příkaz: ");
+                string decision = Console.ReadLine();
 
-            switch(decision)
-            {
-                case "Add":
-                    Console.Write("Zadej typ (Spořící/Úvěrový): ");
-                    string type = Console.ReadLine();
-                    if(type == "Sporici" || type == "Spořící") { Sporici sp = new Sporici(50000); }
-                    if (type == "Uverovy" || type == "Úvěrový") { Uverovy uv = new Uverovy(50000); }
-                    break;
-                case "Manage":
-                    break;
-                case "Remove":
-                    break;
-                case "Date":
-                    Console.WriteLine(t.ToString()) ;
-                    break;
-            }
-            
+                switch (decision)
+                {
+                    case "Add":
+                        Console.Write("Zadej typ (Spořící/Úvěrový/Studentský): ");
+                        string type = Console.ReadLine();
+                        if (type == "Sporici" || type == "Spořící") { Sporici sp = new Sporici(50000); }
+                        if (type == "Studentsky" || type == "Studentský") { Studentsky st = new Studentsky(50000); }
+                        if (type == "Uverovy" || type == "Úvěrový") { Uverovy uv = new Uverovy(50000); }
+                        else { throw new FormatException(); }
+                        break;
+                    case "Manage":
+                        break;
+                    case "Remove":
+                        break;
+                    case "Date":
+                        Console.WriteLine(t.ToString());
+                        break;
+                }
+            } while (true);
         }
     }
 
     public class Time
-    {   public Time(DateTime dt)
-            {
+    { 
+        public Time(DateTime dt)
+        {
             Dt = dt;
-            }
+        }
         DateTime Dt { get; set; }
         public void TimeStart(System.Timers.Timer t) 
         {
@@ -70,33 +78,40 @@ Date ~ Vypsání dnešního data
 
     public class Account
     {
-        public Account(string typ)
+        public Account(string typ, int vklad)
         {
             Typ = typ;
+            Vklad = vklad;
         }
 
         public string Typ { get; set; }
+        public int Vklad { get; set; }
     }
 
     public class Sporici:Account
     {
-        public Sporici(int vklad):base("Sporici")
+        public Sporici(int vklad):base("Sporici", vklad)
         {
             Vklad = vklad;
         }
 
-        public int Vklad { get; set; }
+        public bool Student { get; set; }
     }
 
     public class Uverovy:Account
     {
-        public Uverovy(int vklad) : base("Uverovy")
+        public Uverovy(int vklad) : base("Uverovy", vklad)
         {
             Vklad = vklad;
         }
-
-        public int Vklad { get; set; }
     }
 
-    
+    public class Studentsky:Account
+    {
+        public Studentsky(int vklad):base("Studentsky", vklad)
+        {
+            Vklad = vklad;
+
+        }
+    }
 }
