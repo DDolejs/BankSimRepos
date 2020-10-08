@@ -3,16 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
+
 
 namespace BankSim
 {
     class Program
     {
+        
+        
+
         static void Main(string[] args)
         {
+            Timer ti = new Timer(1000);
+            Time t = new Time(DateTime.Now);
+            t.TimeStart(ti); 
             Console.Write(@"Add ~ Vytvoření účtu
 Manage ~ Možnost úpravy účtu
 Remove ~ Zrušení účtu
+Date ~ Vypsání dnešního data
 ");
             string decision = Console.ReadLine();
 
@@ -28,7 +37,34 @@ Remove ~ Zrušení účtu
                     break;
                 case "Remove":
                     break;
+                case "Date":
+                    Console.WriteLine(t.ToString()) ;
+                    break;
             }
+            
+        }
+    }
+
+    public class Time
+    {   public Time(DateTime dt)
+            {
+            Dt = dt;
+            }
+        DateTime Dt { get; set; }
+        public void TimeStart(System.Timers.Timer t) 
+        {
+            t.Enabled = true;
+            t.Elapsed += TickEvent;
+        }
+
+        private void TickEvent(Object source, ElapsedEventArgs e)
+        {
+           Dt =  Dt.AddDays(1);
+        }
+
+        public override string ToString()
+        {
+            return Dt.ToString();
         }
     }
 
@@ -61,4 +97,6 @@ Remove ~ Zrušení účtu
 
         public int Vklad { get; set; }
     }
+
+    
 }
