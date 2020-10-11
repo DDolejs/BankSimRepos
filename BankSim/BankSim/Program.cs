@@ -33,18 +33,19 @@ Příkaz: ");
                 switch (decision)
                 {
                     case "Add":
-                        acc.AccountAdd(AccountList);
+                        acc.AccAdd(AccountList);
                         break;
                     case "Manage":
                         break;
                     case "Remove":
-                        acc.AccountRemove(AccountList);
+                        acc.DeleteAcc(AccountList);
                         break;
                     case "Date":
                         Console.WriteLine(t.ToString());
                         break;
                 }
                 Console.ReadLine();
+
             } while (true);
         }
     }
@@ -89,52 +90,54 @@ Příkaz: ");
         public string Typ { get; set; }
         public int Zustatek { get; set; }
 
-        public List<Account> AccountAdd(List<Account> AccountList)
+        public string Owner { get; set; }
+
+        public void AccAdd(List<Account> AccountList)
         {
-            Console.Write("Zadej typ (Spořící/Úvěrový/Studentský): ");
+            Console.Write("Zadejte příjmení vlastníka: ");
+            string surname = Console.ReadLine();
+            Console.Write("Zadejte typ účtu (Spořící/Úvěrový/Studentský): ");
             string type = Console.ReadLine();
-            if (type == "Sporici" || type == "Spořící") { Sporici sp = new Sporici(50000); AccountList.Add(sp); }
-            if (type == "Studentsky" || type == "Studentský") { Studentsky st = new Studentsky(50000); AccountList.Add(st); }
-            if (type == "Uverovy" || type == "Úvěrový") { Uverovy uv = new Uverovy(50000); AccountList.Add(uv); }
-            else { throw new FormatException(); }
-            return AccountList;
+            if (type == "Spořící" || type == "Sporici") { Sporici spAcc = new Sporici(0, surname); AccountList.Add(spAcc); }
+            if (type == "Úvěrový" || type == "Uverovy") { Uverovy uvAcc = new Uverovy(0, surname); AccountList.Add(uvAcc); }
+            if (type == "Studentský" || type == "Studentsky") { Studentsky stAcc = new Studentsky(0, surname); AccountList.Add(stAcc); }
         }
 
-        public List<Account> AccountRemove(List<Account> AccountList)
+        public void DeleteAcc(List<Account> AccountList)
         {
-            Console.Write("Zadej typ (Spořící/Úvěrový/Studentský): ");
-            string whatToRemove = Console.ReadLine();
-            if (whatToRemove == "Sporici" || whatToRemove == "Spořící") { Sporici sp = new Sporici(50000); AccountList.Remove(sp); }
-            if (whatToRemove == "Studentsky" || whatToRemove == "Studentský") { Studentsky st = new Studentsky(50000); AccountList.Remove(st); }
-            if (whatToRemove == "Uverovy" || whatToRemove == "Úvěrový") { Uverovy uv = new Uverovy(50000); AccountList.Remove(uv); }
-            else { throw new FormatException(); }
-            return AccountList;
-
+            Console.Write("Zadej jméno vlastníka, co účet maže: ");
+            string surname = Console.ReadLine();
+            foreach(Account acc in AccountList)
+            {
+                if(acc.Owner == surname) { AccountList.Remove(acc); return; }
+            }
         }
     }
 
     public class Sporici:Account
     {
-        public Sporici(int vklad):base("Sporici", vklad)
+        public Sporici(int vklad, string owner):base("Sporici", vklad)
         {
             Zustatek = vklad;
+            Owner = owner;
         }
     }
 
     public class Uverovy:Account
     {
-        public Uverovy(int vklad) : base("Uverovy", vklad)
+        public Uverovy(int vklad, string owner) : base("Uverovy", vklad)
         {
             Zustatek = vklad;
+            Owner = owner;
         }
     }
 
     public class Studentsky:Account
     {
-        public Studentsky(int vklad):base("Studentsky", vklad)
+        public Studentsky(int vklad, string owner) :base("Studentsky", vklad)
         {
             Zustatek = vklad;
-
+            Owner = owner;
         }
     }
 }
