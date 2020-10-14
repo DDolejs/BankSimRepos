@@ -36,6 +36,7 @@ Příkaz: ");
                         acc.AccAdd(AccountList);
                         break;
                     case "Manage":
+                        acc.AccManage(AccountList);
                         break;
                     case "Remove":
                         acc.DeleteAcc(AccountList);
@@ -111,6 +112,51 @@ Příkaz: ");
             {
                 if(acc.Owner == surname) { AccountList.Remove(acc); return; }
             }
+        }
+
+        public void AccManage(List<Account> AccountList)
+        {
+            Console.Clear();
+            Console.Write(@"Zadejte, jak chcete účet upravit?
+Deposit ~ vybere peníze z účtu
+Add ~ Přidá penize na účet
+History ~ Vypíše historii pohybů účtu
+Příkaz: ");
+            string decision = Console.ReadLine();
+            switch (decision)
+            {
+                case "Add":
+                    Console.Write("Zadejte vlastníka účtu: ");
+                    string surname = Console.ReadLine();
+                    Console.Write("Kolik se připočte: ");
+                    string s = Console.ReadLine();
+                    int Plus = Convert.ToInt32(s);
+                    foreach (Account acc in AccountList)
+                    {
+                        if (acc.Owner == surname) 
+                        {
+                            acc.Zustatek += Plus;
+                        }
+                    }
+                    break;
+                case "Deposit":
+                    Console.Write("Zadejte vlastníka účtu: ");
+                    string sur = Console.ReadLine();
+                    Console.Write("Kolik se odečte: ");
+                    string t = Console.ReadLine();
+                    int minus = Convert.ToInt32(t);
+                    foreach (Account acc in AccountList)
+                    {
+                        if (acc.Owner == sur)
+                        {
+                            if(acc.Zustatek - minus > 0) { acc.Zustatek -= minus; }
+                        }
+                    }
+                    break;
+                case "History":
+                    break;
+            }
+            Console.ReadLine();
         }
     }
 
