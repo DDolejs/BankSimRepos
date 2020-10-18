@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
@@ -13,13 +14,14 @@ namespace BankSim
 {
     class Program
     {
+        static List<string> HistoryList = new List<string>();
+        static List<Account> AccountList = new List<Account>();
         static void Main(string[] args)
         {
             Account acc = new Account();
             Timer ti = new Timer(1000);
             Time t = new Time(DateTime.Now);
             t.TimeStart(ti);
-            List<Account> AccountList = new List<Account>();
             do
             {
                 Console.Clear();
@@ -27,27 +29,43 @@ namespace BankSim
 Manage ~ Možnost úpravy účtu
 Remove ~ Zrušení účtu
 Date ~ Vypsání dnešního data
+Exit ~ Vypnutí aplikace
 Příkaz: ");
                 string decision = Console.ReadLine();
 
                 switch (decision)
                 {
                     case "Add":
-                        acc.AccAdd(AccountList);
+                        acc.AccAdd(AccountList, HistoryList);
                         break;
                     case "Manage":
-                        acc.AccManage(AccountList);
+                        acc.AccManage(AccountList, HistoryList);
                         break;
                     case "Remove":
-                        acc.DeleteAcc(AccountList);
+                        acc.DeleteAcc(AccountList, HistoryList);
                         break;
                     case "Date":
                         Console.WriteLine(t.ToString());
                         break;
+                    case "Exit":
+                        AppDomain.CurrentDomain.ProcessExit += new EventHandler(Domain_Exit);
+                        break;
                 }
+                //Console.Write(AccountList[0].Zustatek); // jen test jestli fungují listy
                 Console.ReadLine();
-
             } while (true);
+        }
+
+        static void Domain_Exit(object sender, EventArgs e)
+        {
+            FileStream fs = new FileStream("history.txt", FileMode.Append);
+            StreamWriter sw = new StreamWriter(fs);
+            foreach(string s in HistoryList.ToArray())
+            {
+                sw.WriteLine(s);
+            }
+            sw.Close();
+            fs.Close();
         }
     }
 
@@ -93,31 +111,31 @@ Příkaz: ");
 
         public string Owner { get; set; }
 
-        public void AccAdd(List<Account> AccountList)
+        public void AccAdd(List<Account> AccountList, List<string> HistoryList)
         {
             Console.Write("Zadejte příjmení vlastníka: ");
             string surname = Console.ReadLine();
             Console.Write("Zadejte typ účtu (Spořící/Úvěrový/Studentský): ");
             string type = Console.ReadLine();
-            if (type == "Spořící" || type == "Sporici") { Sporici spAcc = new Sporici(0, surname); AccountList.Add(spAcc); }
-            if (type == "Úvěrový" || type == "Uverovy") { Uverovy uvAcc = new Uverovy(0, surname); AccountList.Add(uvAcc); }
-            if (type == "Studentský" || type == "Studentsky") { Studentsky stAcc = new Studentsky(0, surname); AccountList.Add(stAcc); }
+            if (type == "Spořící" || type == "Sporici") { Sporici spAcc = new Sporici(0, surname); AccountList.Add(spAcc); HistoryList.Add($"Added {type} account owned by {surname}"); }
+            if (type == "Úvěrový" || type == "Uverovy") { Uverovy uvAcc = new Uverovy(0, surname); AccountList.Add(uvAcc); HistoryList.Add($"Added {type} account owned by {surname}"); }
+            if (type == "Studentský" || type == "Studentsky") { Studentsky stAcc = new Studentsky(0, surname); AccountList.Add(stAcc); HistoryList.Add($"Added {type} account owned by {surname}"); }
         }
 
-        public void DeleteAcc(List<Account> AccountList)
+        public void DeleteAcc(List<Account> AccountList, List<string> HistoryList)
         {
             Console.Write("Zadej jméno vlastníka, co účet maže: ");
             string surname = Console.ReadLine();
             foreach(Account acc in AccountList)
             {
-                if(acc.Owner == surname) { AccountList.Remove(acc); return; }
+                if(acc.Owner == surname) { HistoryList.Add($"Removed {acc.Typ} account owned by {surname}"); AccountList.Remove(acc);  return; }
             }
         }
 
-        public void AccManage(List<Account> AccountList)
+        public void AccManage(List<Account> AccountList, List<string> HistoryList)
         {
             Console.Clear();
-            Console.Write(@"Zadejte, jak chcete účet upravit?
+            Console.Write(@"Zadejte, co chcete dělat?
 Deposit ~ vybere peníze z účtu
 Add ~ Přidá penize na účet
 History ~ Vypíše historii pohybů účtu
@@ -138,6 +156,7 @@ Příkaz: ");
                             acc.Zustatek += Plus;
                         }
                     }
+                    HistoryList.Add($"Added {Plus}czk.");
                     break;
                 case "Deposit":
                     Console.Write("Zadejte vlastníka účtu: ");
@@ -152,8 +171,14 @@ Příkaz: ");
                             if(acc.Zustatek - minus > 0) { acc.Zustatek -= minus; }
                         }
                     }
+                    HistoryList.Add($"Deposited {minus}czk.");
                     break;
                 case "History":
+                    FileStream fs = new FileStream("history.txt", FileMode.Open);
+                    StreamReader sr = new StreamReader(fs);
+                    
+                    sr.Close();
+                    fs.Close();
                     break;
             }
             Console.ReadLine();
