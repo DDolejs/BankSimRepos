@@ -15,12 +15,12 @@ namespace BankSim
     class Program
     {
         static List<string> HistoryList = new List<string>();
-        static List<Account> AccountList = new List<Account>();
+        public static List<Account> AccountList = new List<Account>();
         static void Main(string[] args)
         {
             Account acc = new Account();
             Timer ti = new Timer(1000);
-            Time t = new Time(DateTime.Now);
+            Time t = new Time(DateTime.Now, AccountList);
             t.TimeStart(ti);
             do
             {
@@ -71,11 +71,12 @@ Příkaz: ");
 
     public class Time
     { 
-        public Time(DateTime dt)
+        public Time(DateTime dt,List<Account> ac)
         {
             Dt = dt;
         }
         DateTime Dt { get; set; }
+        List<Account> Ac { get; set; }
         public void TimeStart(System.Timers.Timer t) 
         {
             t.Enabled = true;
@@ -85,6 +86,18 @@ Příkaz: ");
         private void TickEvent(Object source, ElapsedEventArgs e)
         {
            Dt =  Dt.AddDays(1);
+            if (Dt.Month != Dt.AddDays(-1).Month)
+            {
+                
+                if (Ac != null)
+                {
+                    foreach (Account item in Ac)
+                    {
+                        Console.WriteLine(item);
+                    }
+                } 
+                
+            }
         }
 
         public override string ToString()
