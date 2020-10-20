@@ -18,6 +18,7 @@ namespace BankSim
         public static List<Account> AccountList = new List<Account>();
         static void Main(string[] args)
         {
+            Domain_Load(AccountList);
             Account acc = new Account();
             Timer ti = new Timer(1000);
             Time t = new Time(DateTime.Now, AccountList);
@@ -49,9 +50,9 @@ Příkaz: ");
                         break;
                     case "Exit":
                         AppDomain.CurrentDomain.ProcessExit += new EventHandler(Domain_Exit);
+                        Environment.Exit(0);
                         break;
                 }
-                //Console.Write(AccountList[0].Zustatek); // jen test jestli fungují listy
                 Console.ReadLine();
             } while (true);
         }
@@ -66,6 +67,29 @@ Příkaz: ");
             }
             sw.Close();
             fs.Close();
+
+            FileStream fsAcc = new FileStream("Accounts.txt", FileMode.Create);
+            StreamWriter swAcc = new StreamWriter(fs);
+            foreach(Account acc in AccountList)
+            {
+                sw.WriteLine($"{acc.Typ}/{acc.Owner}/{acc.Zustatek}");
+            }
+            swAcc.Close();
+            fs.Close();
+        }
+        static void Domain_Load(List<Account> AccountList)
+        {
+            FileStream fs = new FileStream("Accounts.txt", FileMode.Open);
+            StreamReader sr = new StreamReader(fs);
+            int count = File.ReadAllLines("Accounts.txt").Length;
+            for(int x = 0; x < count; x++)
+            {
+                string s = sr.ReadLine();
+                string[] Array = s.Split('/');
+                AccountList.Add(new Account(Array[0], Convert.ToInt32(Array[1]), Array[2]));
+            }
+            sr.Close();
+            fs.Close();
         }
     }
 
@@ -74,6 +98,7 @@ Příkaz: ");
         public Time(DateTime dt,List<Account> ac)
         {
             Dt = dt;
+            Ac = ac;
         }
         DateTime Dt { get; set; }
         List<Account> Ac { get; set; }
@@ -108,10 +133,11 @@ Příkaz: ");
 
     public class Account
     {
-        public Account(string typ, int vklad)
+        public Account(string typ, int vklad, string owner)
         {
             Typ = typ;
             Zustatek = vklad;
+            Owner = owner;
         }
 
         public Account()
@@ -169,7 +195,7 @@ Příkaz: ");
                             acc.Zustatek += Plus;
                         }
                     }
-                    HistoryList.Add($"Added {Plus}czk.");
+                    HistoryList.Add($"Added {Plus}czk to account owned by {surname}.");
                     break;
                 case "Deposit":
                     Console.Write("Zadejte vlastníka účtu: ");
@@ -184,12 +210,12 @@ Příkaz: ");
                             if(acc.Zustatek - minus > 0) { acc.Zustatek -= minus; }
                         }
                     }
-                    HistoryList.Add($"Deposited {minus}czk.");
+                    HistoryList.Add($"Deposited {minus}czk from account owned by {sur}.");
                     break;
                 case "History":
                     FileStream fs = new FileStream("history.txt", FileMode.Open);
                     StreamReader sr = new StreamReader(fs);
-                    
+                    Console.WriteLine(sr.ReadToEnd());
                     sr.Close();
                     fs.Close();
                     break;
@@ -200,7 +226,7 @@ Příkaz: ");
 
     public class Sporici:Account
     {
-        public Sporici(int vklad, string owner):base("Sporici", vklad)
+        public Sporici(int vklad, string owner):base("Sporici", vklad, owner)
         {
             Zustatek = vklad;
             Owner = owner;
@@ -209,7 +235,7 @@ Příkaz: ");
 
     public class Uverovy:Account
     {
-        public Uverovy(int vklad, string owner) : base("Uverovy", vklad)
+        public Uverovy(int vklad, string owner) : base("Uverovy", vklad, owner)
         {
             Zustatek = vklad;
             Owner = owner;
@@ -218,7 +244,7 @@ Příkaz: ");
 
     public class Studentsky:Account
     {
-        public Studentsky(int vklad, string owner) :base("Studentsky", vklad)
+        public Studentsky(int vklad, string owner) :base("Studentsky", vklad, owner)
         {
             Zustatek = vklad;
             Owner = owner;
