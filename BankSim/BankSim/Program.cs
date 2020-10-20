@@ -86,7 +86,7 @@ Příkaz: ");
         private void TickEvent(Object source, ElapsedEventArgs e)
         {
            Dt =  Dt.AddDays(1);
-            if (Dt.Month != Dt.AddDays(-1).Month)
+            if (Dt.Month != Dt.AddDays(-1).Month)//pokaždé, kdž se změní měsíc >>> do this
             {
                 
                 if (Ac != null)
