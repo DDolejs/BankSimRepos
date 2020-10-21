@@ -16,12 +16,14 @@ namespace BankSim
     {
         static List<string> HistoryList = new List<string>();
         public static List<Account> AccountList = new List<Account>();
+        public static bool isusing = false;
         static void Main(string[] args)
         {
             Domain_Load(AccountList);
             Account acc = new Account();
             Timer ti = new Timer(1000);
             Time t = new Time(DateTime.Now, AccountList);
+            
             t.TimeStart(ti);
             do
             {
