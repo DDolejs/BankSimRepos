@@ -121,7 +121,8 @@ Příkaz: ");
                     }
                     else
                     {
-
+                        Uverovy uv = acc as Uverovy;
+                        uv.Jistina *= 1.02;
                     }
                 }
 
@@ -160,7 +161,7 @@ Příkaz: ");
             Console.Write("Zadejte typ účtu (Spořící/Úvěrový/Studentský): ");
             string type = Console.ReadLine();
             if (type == "Spořící" || type == "Sporici") { Sporici spAcc = new Sporici(500.0, surname); AccountList.Add(spAcc); HistoryList.Add($"Added {type} account owned by {surname}"); }
-            if (type == "Úvěrový" || type == "Uverovy") { Uverovy uvAcc = new Uverovy(500.0, surname); AccountList.Add(uvAcc); HistoryList.Add($"Added {type} account owned by {surname}"); }
+            if (type == "Úvěrový" || type == "Uverovy") { Uverovy uvAcc = new Uverovy(500.0, surname, 2000, 50000); AccountList.Add(uvAcc); HistoryList.Add($"Added {type} account owned by {surname}"); }
             if (type == "Studentský" || type == "Studentsky") { Studentsky stAcc = new Studentsky(500.0, surname); AccountList.Add(stAcc); HistoryList.Add($"Added {type} account owned by {surname}"); }
         }
 
@@ -196,6 +197,7 @@ Příkaz: ");
                         if (acc.Owner == surname) 
                         {
                             acc.Zustatek += Plus;
+                            if()
                         }
                     }
                     HistoryList.Add($"Added {Plus}czk to account owned by {surname}.");
@@ -208,13 +210,18 @@ Příkaz: ");
                     double minus = Convert.ToDouble(t);
                     foreach (Account acc in AccountList)
                     {
-                        if (acc.Owner == sur || acc.Typ != "Uverovy")
+                        if (acc.Owner == sur || acc.Typ == "Sporici")
                         {
                             if(acc.Zustatek - minus > 0) { acc.Zustatek -= minus; }
                         }
-                        else
+                        if (acc.Owner == sur || acc.Typ == "Studentsky")
                         {
-                            acc.Zustatek -= minus;
+                            if (acc.Zustatek - minus > 0 && minus <= 500) { acc.Zustatek -= minus; }
+                        }
+                        if (acc.Owner == sur || acc.Typ == "Uverovy")
+                        {
+                            Uverovy sp = acc as Uverovy;
+                            if (minus < sp.UverovyRamec) { sp.Zustatek -= minus; }
                         }
                     }
                     HistoryList.Add($"Deposited {minus}czk from account owned by {sur}.");
@@ -242,11 +249,16 @@ Příkaz: ");
 
     public class Uverovy:Account
     {
-        public Uverovy(double vklad, string owner) : base("Uverovy", vklad, owner)
+        public Uverovy(double vklad, string owner, double UR, double dluh) : base("Uverovy", vklad, owner)
         {
             Zustatek = vklad;
             Owner = owner;
+            UverovyRamec = UR;
+            Jistina = dluh;
         }
+
+        public double UverovyRamec { get; set; }
+        public double Jistina { get; set; }
     }
 
     public class Studentsky:Account
