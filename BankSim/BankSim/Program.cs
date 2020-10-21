@@ -108,20 +108,23 @@ Příkaz: ");
             t.Elapsed += TickEvent;
         }
 
-        private void TickEvent(Object source, ElapsedEventArgs e)
+        public void TickEvent(Object source, ElapsedEventArgs e)
         {
            Dt =  Dt.AddDays(1);
-            if (Dt.Month != Dt.AddDays(-1).Month)//pokaždé, kdž se změní měsíc >>> do this
+            if (Dt.Month != Dt.AddDays(-1).Month)//pokaždé, když se změní měsíc >>> do this
             {
-                
-                if (Ac != null)
+                foreach(Account acc in Ac)
                 {
-                    foreach (Account item in Ac)
+                    if(acc.Typ != "Uverovy")
                     {
-                        Console.WriteLine(item);
+                        acc.Zustatek *= 1.02;
                     }
-                } 
-                
+                    else
+                    {
+
+                    }
+                }
+
             }
         }
 
@@ -133,7 +136,7 @@ Příkaz: ");
 
     public class Account
     {
-        public Account(string typ, int vklad, string owner)
+        public Account(string typ, double vklad, string owner)
         {
             Typ = typ;
             Zustatek = vklad;
@@ -146,7 +149,7 @@ Příkaz: ");
         }
 
         public string Typ { get; set; }
-        public int Zustatek { get; set; }
+        public double Zustatek { get; set; }
 
         public string Owner { get; set; }
 
@@ -156,9 +159,9 @@ Příkaz: ");
             string surname = Console.ReadLine();
             Console.Write("Zadejte typ účtu (Spořící/Úvěrový/Studentský): ");
             string type = Console.ReadLine();
-            if (type == "Spořící" || type == "Sporici") { Sporici spAcc = new Sporici(0, surname); AccountList.Add(spAcc); HistoryList.Add($"Added {type} account owned by {surname}"); }
-            if (type == "Úvěrový" || type == "Uverovy") { Uverovy uvAcc = new Uverovy(0, surname); AccountList.Add(uvAcc); HistoryList.Add($"Added {type} account owned by {surname}"); }
-            if (type == "Studentský" || type == "Studentsky") { Studentsky stAcc = new Studentsky(0, surname); AccountList.Add(stAcc); HistoryList.Add($"Added {type} account owned by {surname}"); }
+            if (type == "Spořící" || type == "Sporici") { Sporici spAcc = new Sporici(500.0, surname); AccountList.Add(spAcc); HistoryList.Add($"Added {type} account owned by {surname}"); }
+            if (type == "Úvěrový" || type == "Uverovy") { Uverovy uvAcc = new Uverovy(500.0, surname); AccountList.Add(uvAcc); HistoryList.Add($"Added {type} account owned by {surname}"); }
+            if (type == "Studentský" || type == "Studentsky") { Studentsky stAcc = new Studentsky(500.0, surname); AccountList.Add(stAcc); HistoryList.Add($"Added {type} account owned by {surname}"); }
         }
 
         public void DeleteAcc(List<Account> AccountList, List<string> HistoryList)
@@ -187,7 +190,7 @@ Příkaz: ");
                     string surname = Console.ReadLine();
                     Console.Write("Kolik se připočte: ");
                     string s = Console.ReadLine();
-                    int Plus = Convert.ToInt32(s);
+                    double Plus = Convert.ToDouble(s);
                     foreach (Account acc in AccountList)
                     {
                         if (acc.Owner == surname) 
@@ -202,12 +205,16 @@ Příkaz: ");
                     string sur = Console.ReadLine();
                     Console.Write("Kolik se odečte: ");
                     string t = Console.ReadLine();
-                    int minus = Convert.ToInt32(t);
+                    double minus = Convert.ToDouble(t);
                     foreach (Account acc in AccountList)
                     {
-                        if (acc.Owner == sur)
+                        if (acc.Owner == sur || acc.Typ != "Uverovy")
                         {
                             if(acc.Zustatek - minus > 0) { acc.Zustatek -= minus; }
+                        }
+                        else
+                        {
+                            acc.Zustatek -= minus;
                         }
                     }
                     HistoryList.Add($"Deposited {minus}czk from account owned by {sur}.");
@@ -226,7 +233,7 @@ Příkaz: ");
 
     public class Sporici:Account
     {
-        public Sporici(int vklad, string owner):base("Sporici", vklad, owner)
+        public Sporici(double vklad, string owner):base("Sporici", vklad, owner)
         {
             Zustatek = vklad;
             Owner = owner;
@@ -235,7 +242,7 @@ Příkaz: ");
 
     public class Uverovy:Account
     {
-        public Uverovy(int vklad, string owner) : base("Uverovy", vklad, owner)
+        public Uverovy(double vklad, string owner) : base("Uverovy", vklad, owner)
         {
             Zustatek = vklad;
             Owner = owner;
@@ -244,7 +251,7 @@ Příkaz: ");
 
     public class Studentsky:Account
     {
-        public Studentsky(int vklad, string owner) :base("Studentsky", vklad, owner)
+        public Studentsky(double vklad, string owner) :base("Studentsky", vklad, owner)
         {
             Zustatek = vklad;
             Owner = owner;
