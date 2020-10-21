@@ -197,7 +197,11 @@ Příkaz: ");
                         if (acc.Owner == surname) 
                         {
                             acc.Zustatek += Plus;
-                            if()
+                            if(acc.Typ == "Uverove")
+                            {
+                                Uverovy uv = acc as Uverovy;
+                                uv.Jistina -= Plus;
+                            }
                         }
                     }
                     HistoryList.Add($"Added {Plus}czk to account owned by {surname}.");
