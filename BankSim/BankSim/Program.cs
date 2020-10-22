@@ -240,7 +240,6 @@ Příkaz: ");
                     fs.Close();
                     break;
             }
-            Console.ReadLine();
         }
     }
 
