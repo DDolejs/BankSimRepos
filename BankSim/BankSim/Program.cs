@@ -59,39 +59,44 @@ Příkaz: ");
             } while (true);
         }
 
-        static void Domain_Exit(object sender, EventArgs e)
+      static void Domain_Exit(object sender, EventArgs e)
         {
-            FileStream fs = new FileStream("history.txt", FileMode.Append);
-            StreamWriter sw = new StreamWriter(fs);
-            foreach(string s in HistoryList.ToArray())
+            //FileStream fs = new FileStream("history.txt", FileMode.Append);
+            //StreamWriter sw = new StreamWriter(fs);
+            //foreach(string s in HistoryList.ToArray())
+            //{
+            //    sw.WriteLine(s);
+            //}
+            //sw.Close();
+            //fs.Close();
+            StreamWriter sw1 = new StreamWriter("history.txt", true);
+            StreamWriter sw2 = new StreamWriter("accounts.txt", true);
+            foreach (string item in HistoryList.ToArray())
             {
-                sw.WriteLine(s);
+                sw1.WriteLine(item);
             }
-            sw.Close();
-            fs.Close();
-
-            FileStream fsAcc = new FileStream("Accounts.txt", FileMode.Create);
-            StreamWriter swAcc = new StreamWriter(fs);
+            //FileStream fsAcc = new FileStream("accounts.txt", FileMode.Create);
+            //StreamWriter swAcc = new StreamWriter(fs);
             foreach(Account acc in AccountList)
             {
-                sw.WriteLine($"{acc.Typ}/{acc.Owner}/{acc.Zustatek}");
+               sw2.WriteLine($"{acc.Typ}/{acc.Owner}/{acc.Zustatek}");
             }
-            swAcc.Close();
-            fs.Close();
+            //swAcc.Close();
+            //fs.Close();
+            sw1.Close();
+            sw2.Close();
         }
         static void Domain_Load(List<Account> AccountList)
         {
-            FileStream fs = new FileStream("Accounts.txt", FileMode.Open);
-            StreamReader sr = new StreamReader(fs);
-            int count = File.ReadAllLines("Accounts.txt").Length;
+
+            int count = File.ReadAllLines("accounts.txt").Length;
             for(int x = 0; x < count; x++)
             {
-                string s = sr.ReadLine();
+                string s = File.ReadLines("accounts.txt").Skip(x).Take(1).First();
                 string[] Array = s.Split('/');
                 AccountList.Add(new Account(Array[0], Convert.ToInt32(Array[1]), Array[2]));
             }
-            sr.Close();
-            fs.Close();
+            
         }
     }
 
