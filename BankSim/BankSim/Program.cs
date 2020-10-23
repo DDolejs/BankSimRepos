@@ -168,7 +168,7 @@ Příkaz: ");
             Console.Write("Zadejte typ účtu (Spořící/Úvěrový/Studentský): ");
             string type = Console.ReadLine();
             if (type == "Spořící" || type == "Sporici") { Sporici spAcc = new Sporici(500.0, surname); AccountList.Add(spAcc); HistoryList.Add($"Added {type} account owned by {surname}"); }
-            if (type == "Úvěrový" || type == "Uverovy") { Uverovy uvAcc = new Uverovy(500.0, surname, 2000, 50000); AccountList.Add(uvAcc); HistoryList.Add($"Added {type} account owned by {surname}"); }
+            if (type == "Úvěrový" || type == "Uverovy") { Uverovy uvAcc = new Uverovy(surname, 2000, 50000); AccountList.Add(uvAcc); HistoryList.Add($"Added {type} account owned by {surname}"); }
             if (type == "Studentský" || type == "Studentsky") { Studentsky stAcc = new Studentsky(500.0, surname); AccountList.Add(stAcc); HistoryList.Add($"Added {type} account owned by {surname}"); }
         }
 
@@ -203,15 +203,22 @@ Příkaz: ");
                     {
                         if (acc.Owner == surname) 
                         {
-                            acc.Zustatek += Plus;
+                            
                             if(acc.Typ == "Uverove")
                             {
+                                HistoryList.Add($"Paid {Plus}czk from you {uv.Jistina}czk debt on account owned by {surname}.");
                                 Uverovy uv = acc as Uverovy;
                                 uv.Jistina -= Plus;
+                                
+                            }
+                            else
+                            {
+                                acc.Zustatek += Plus;
+                                HistoryList.Add($"Added {Plus}czk to account owned by {surname}.");
                             }
                         }
                     }
-                    HistoryList.Add($"Added {Plus}czk to account owned by {surname}.");
+                    
                     break;
                 case "Deposit":
                     Console.Write("Zadejte vlastníka účtu: ");
@@ -259,9 +266,9 @@ Příkaz: ");
 
     public class Uverovy:Account
     {
-        public Uverovy(double vklad, string owner, double UR, double dluh) : base("Uverovy", vklad, owner)
+        public Uverovy(string owner, double UR, double dluh) : base("Uverovy", 0, owner)
         {
-            Zustatek = vklad;
+            Zustatek = 0;
             Owner = owner;
             UverovyRamec = UR;
             Jistina = dluh;
